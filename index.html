@@ -3,53 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Sir Lenard Dashboard</title>
     <style>
-        :root { --gold: #fbc02d; --green: #8bc34a; --white: #ffffff; }
+        :root { --gold: #fbc02d; --gold-dark: #b38600; --green: #8bc34a; --done-green: rgba(46, 125, 50, 0.7); }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
         body { font-family: 'Arial Black', sans-serif; height: 100vh; width: 100vw; overflow: hidden; background: #000; }
         
+        /* BACKGROUND WITH 59% OVERLAY */
         .bg-fixed { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: linear-gradient(rgba(0,0,0,0.59), rgba(0,0,0,0.59)), url('image_992624.jpg'); 
             background-size: cover; background-position: center; z-index: -1;
         }
 
-        .page { display: none; height: 100vh; width: 100vw; flex-direction: column; align-items: center; padding: 30px 20px; text-align: center; }
+        .page { display: none; height: 100vh; width: 100vw; flex-direction: column; align-items: center; padding: 25px 20px; text-align: center; }
         .page.active { display: flex; }
 
         /* LOCK SCREEN */
         .dot { width: 12px; height: 12px; border: 2px solid white; border-radius: 50%; margin: 0 5px; }
         .dot.filled { background: white; }
-        .keypad { display: grid; grid-template-columns: repeat(3, 80px); gap: 15px; margin-top: 20px; }
+        .keypad { display: grid; grid-template-columns: repeat(3, 80px); gap: 15px; margin-top: 15px; }
         .key { width: 80px; height: 80px; border: 2px solid var(--gold); border-radius: 50%; color: var(--gold); background: none; font-size: 28px; font-weight: bold; }
 
-        /* MAIN DASHBOARD */
-        .header-text { color: white; font-size: 45px; margin: 10px 0; line-height: 0.8; text-transform: uppercase; }
-        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
-        .gold-btn { background: var(--gold); color: white; border: none; border-radius: 12px; font-size: 18px; font-weight: 900; padding: 20px 5px; box-shadow: 0 4px 0 #b38600; }
-        .wide { grid-column: span 2; font-size: 22px; }
-        
-        /* Centered Utility Section */
-        .utility-section { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 15px; }
-        .green-btn { background: var(--green); color: white; border: none; border-radius: 20px; font-size: 16px; font-weight: 900; padding: 12px 25px; width: 85%; box-shadow: 0 3px 0 #689f38; }
+        /* DASHBOARD */
+        .header-text { color: white; font-size: 40px; margin: 10px 0; line-height: 0.8; text-transform: uppercase; }
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
+        .gold-btn { 
+            position: relative; background: var(--gold); color: white; border: none; 
+            border-radius: 12px; font-size: 16px; font-weight: 900; padding: 18px 5px; 
+            box-shadow: 0 4px 0 var(--gold-dark); overflow: hidden; cursor: pointer;
+        }
+        .fill-bar { position: absolute; top: 0; left: 0; height: 100%; background: rgba(0, 0, 0, 0.25); width: 0%; z-index: 1; pointer-events: none; transition: background 0.5s; }
+        .fill-bar.complete { background: var(--done-green); }
+        .btn-text { position: relative; z-index: 2; }
+        .wide { grid-column: span 2; font-size: 20px; }
+        .utility-section { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 10px; }
+        .green-btn { background: var(--green); color: white; border: none; border-radius: 20px; font-size: 15px; font-weight: 900; padding: 10px 25px; width: 85%; box-shadow: 0 3px 0 #689f38; }
 
-        /* SUBJECT PAGE */
-        .sub-header { color: white; font-size: 32px; margin-bottom: 20px; }
-        .tab-row { display: flex; gap: 8px; width: 100%; justify-content: center; }
+        /* EDITOR & TABS */
+        .tab-row { display: flex; gap: 8px; width: 100%; justify-content: center; margin-bottom: 10px; }
         .tab-btn { background: var(--gold); color: white; padding: 8px 15px; border-radius: 8px; border: none; font-weight: bold; font-size: 14px; }
-        .editor-container { background: white; width: 100%; border-radius: 15px; margin-top: 15px; flex-grow: 1; padding: 15px; text-align: left; overflow-y: auto; }
-        .bottom-btns { display: flex; gap: 10px; width: 100%; margin-top: 15px; margin-bottom: 10px; }
-        .grad-text { color: var(--green); font-size: 18px; margin-top: auto; padding-bottom: 15px; }
+        .editor-container { background: white; width: 100%; border-radius: 15px; flex-grow: 1; padding: 15px; text-align: left; overflow-y: auto; color: #333; font-family: sans-serif; }
+        .toolbar { display: flex; flex-wrap: wrap; gap: 5px; background: rgba(255,255,255,0.2); padding: 8px; border-radius: 10px; margin-bottom: 10px; width: 100%; justify-content: center; }
+        .tool-btn { background: var(--gold); border: none; color: white; padding: 5px 10px; border-radius: 5px; font-size: 12px; font-weight: bold; }
+        
+        /* SKETCH LAYER */
+        #sketch-layer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 3000; }
+        #canvas { width: 100%; height: 100%; touch-action: none; }
+
+        /* CHECKLIST */
+        .task { display: flex; align-items: center; gap: 10px; margin: 5px 0; }
+        .task.checked { text-decoration: line-through; color: #888; }
+        
+        .grad-text { color: var(--green); font-size: 16px; margin-top: auto; padding-bottom: 10px; }
     </style>
 </head>
 <body>
     <div class="bg-fixed"></div>
 
     <div id="lock" class="page active">
-        <img src="image_62b0e5.png" width="150" alt="CvSU Logo">
-        <h1 style="color:white; margin: 20px 0;">Welcome, sir!</h1>
-        <div style="display:flex; margin-bottom: 20px;" id="dots">
+        <img src="image_62b0e5.png" width="140" alt="Logo">
+        <h1 style="color:white; margin: 15px 0;">Welcome, sir!</h1>
+        <div style="display:flex; margin-bottom: 15px;" id="dots">
             <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
         </div>
         <div class="keypad">
@@ -61,103 +78,184 @@
     </div>
 
     <div id="dash" class="page">
-        <img src="image_62b0e5.png" width="80" alt="Logo" onclick="doPortal()" style="cursor: pointer;">
+        <img src="image_62b0e5.png" width="75" onclick="doPortal()" style="cursor:pointer">
         <h1 class="header-text">Class<br>Schedule</h1>
         <div class="btn-grid">
-            <button class="gold-btn wide" onclick="goSub('Competency Appraisal')">Competency Appraisal</button>
-            <button class="gold-btn" onclick="goSub('Art Appreciation')">Art App</button>
-            <button class="gold-btn" onclick="goSub('Gender and Society')">Gen Soc</button>
-            <button class="gold-btn" onclick="goSub('The Contemporary World')">Contemp</button>
-            <button class="gold-btn" onclick="goSub('Masining na Pagpapahayag')">Retorika</button>
-            <button class="gold-btn" onclick="goSub('Ethics')">Ethics</button>
-            <button class="gold-btn" onclick="goSub('Life and Works of Rizal')">Rizal</button>
+            <button class="gold-btn wide" data-start="09:00" data-end="15:00" onclick="handleBtnTap(this, 'Competency Appraisal')">
+                <div class="fill-bar"></div><span class="btn-text">Competency Appraisal</span>
+            </button>
+            <button class="gold-btn" data-start="07:00" data-end="09:00" onclick="handleBtnTap(this, 'Art Appreciation')">
+                <div class="fill-bar"></div><span class="btn-text">Art App</span>
+            </button>
+            <button class="gold-btn" data-start="09:00" data-end="11:00" onclick="handleBtnTap(this, 'Gender and Society')">
+                <div class="fill-bar"></div><span class="btn-text">Gen Soc</span>
+            </button>
+            <button class="gold-btn" data-start="07:00" data-end="09:00" onclick="handleBtnTap(this, 'The Contemporary World')">
+                <div class="fill-bar"></div><span class="btn-text">Contemp</span>
+            </button>
+            <button class="gold-btn" data-start="09:00" data-end="11:00" onclick="handleBtnTap(this, 'Masining na Pagpapahayag')">
+                <div class="fill-bar"></div><span class="btn-text">Retorika</span>
+            </button>
+            <button class="gold-btn" data-start="07:00" data-end="09:00" onclick="handleBtnTap(this, 'Ethics')">
+                <div class="fill-bar"></div><span class="btn-text">Ethics</span>
+            </button>
+            <button class="gold-btn" data-start="09:00" data-end="11:00" onclick="handleBtnTap(this, 'Life and Works of Rizal')">
+                <div class="fill-bar"></div><span class="btn-text">Rizal</span>
+            </button>
         </div>
-        
         <div class="utility-section">
             <button class="green-btn" onclick="goSub('Exit Clearance')">Exit Clearance</button>
             <button class="green-btn" onclick="goSub('General Notes')">General Notes</button>
         </div>
-        
         <p class="grad-text" id="grad-counter" onclick="setGrad()">244 days before Graduation!</p>
     </div>
 
     <div id="sub-page" class="page">
-        <button onclick="goDash()" style="align-self: flex-start; background:red; color:white; border:none; padding:8px 15px; border-radius:5px; font-weight:bold;">Back</button>
-        <img src="image_62b0e5.png" width="60" style="margin-top: -35px;" alt="Logo" onclick="doPortal()">
-        <h2 id="sub-title" class="sub-header">Subject Name</h2>
+        <button onclick="goDash()" style="align-self:flex-start; background:red; color:white; border:none; padding:8px 15px; border-radius:5px; font-weight:bold;">Back</button>
+        <h2 id="sub-title" style="color:white; margin:10px 0; font-size:28px;">Subject</h2>
+        
         <div class="tab-row">
             <button class="tab-btn" onclick="setTab('Notes')">Notes</button>
             <button class="tab-btn" onclick="setTab('Reminders')">Reminders</button>
             <button class="tab-btn" onclick="doDrive()">Files</button>
         </div>
-        <div id="editor" class="editor-container" contenteditable="true" oninput="save()">Start typing...</div>
-        <div class="bottom-btns">
+
+        <div id="editor-tools" class="toolbar">
+            <button class="tool-btn" onclick="addChecklist()">Checklist</button>
+            <button class="tool-btn" onclick="triggerImg()">Image</button>
+            <button class="tool-btn" onclick="openSketch()">Sketch</button>
+        </div>
+        <input type="file" id="img-input" style="display:none;" accept="image/*" onchange="insertImg()">
+
+        <div id="editor" class="editor-container" contenteditable="true" oninput="save()"></div>
+
+        <div id="grade-ui" style="display:none; width:100%; background:white; padding:15px; border-radius:15px; overflow-y:auto;">
+            <h3 style="margin-bottom:10px;">Weighted Grades</h3>
+            <div id="grade-rows"></div>
+            <button class="tool-btn" style="margin-top:10px" onclick="addGradeRow()">+ Add Category</button>
+            <div style="margin-top:15px; font-weight:bold; color:var(--green); font-size:22px;">
+                Total: <span id="final-calc">0.00%</span>
+            </div>
+        </div>
+
+        <div class="bottom-btns" style="display:flex; gap:10px; width:100%; margin-top:10px;">
             <button class="green-btn" style="width:50%" onclick="setTab('History')">History</button>
-            <button class="green-btn" style="width:50%" onclick="setTab('Grades')">Grade Tracker</button>
+            <button class="green-btn" style="width:50%" onclick="setTab('Grades')">Grades</button>
+        </div>
+    </div>
+
+    <div id="sketch-layer">
+        <canvas id="canvas"></canvas>
+        <div style="position:absolute; bottom:20px; left:50%; transform:translateX(-50%); display:flex; gap:10px;">
+            <button onclick="saveSketch()" style="background:var(--green); color:white; padding:15px; border:none; border-radius:10px; font-weight:bold;">SAVE SKETCH</button>
+            <button onclick="closeSketch()" style="background:red; color:white; padding:15px; border:none; border-radius:10px; font-weight:bold;">CANCEL</button>
         </div>
     </div>
 
     <script>
-        let pin = "";
-        const secret = "2113"; //
-        let curSub = "";
-        let curTab = "Notes";
+        if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js'); }
 
+        let pin = ""; const secret = "2113";
+        let curSub = ""; let curTab = "Notes";
+
+        // CANVAS ENGINE
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let drawing = false;
+
+        function openSketch() {
+            document.getElementById('sketch-layer').style.display = 'block';
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.strokeStyle = '#000';
+        }
+        canvas.addEventListener('touchstart', e => { drawing = true; ctx.beginPath(); const t = e.touches[0]; ctx.moveTo(t.clientX, t.clientY); });
+        canvas.addEventListener('touchmove', e => { if (!drawing) return; const t = e.touches[0]; ctx.lineTo(t.clientX, t.clientY); ctx.stroke(); });
+        canvas.addEventListener('touchend', () => drawing = false);
+        function saveSketch() {
+            const data = canvas.toDataURL();
+            document.getElementById('editor').innerHTML += `<img src="${data}" style="max-width:100%; margin-top:10px;">`;
+            save(); closeSketch();
+        }
+        function closeSketch() { document.getElementById('sketch-layer').style.display = 'none'; }
+
+        // PIN & NAVIGATION
         function tap(n) {
             if(pin.length < 4) {
-                pin += n;
-                document.querySelectorAll('.dot')[pin.length-1].classList.add('filled');
+                pin += n; document.querySelectorAll('.dot')[pin.length-1].classList.add('filled');
                 if(pin.length === 4) {
                     if(pin === secret) { show('dash'); }
-                    else { alert("Wrong PIN"); pin = ""; document.querySelectorAll('.dot').forEach(d=>d.classList.remove('filled')); }
+                    else { pin = ""; document.querySelectorAll('.dot').forEach(d=>d.classList.remove('filled')); }
                 }
             }
         }
-
-        function show(id) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            if(id === 'dash') updateGrad();
-        }
-
-        function goSub(name) {
-            curSub = name;
-            document.getElementById('sub-title').innerText = name;
-            show('sub-page');
-            setTab('Notes');
-        }
-
+        function show(id) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); if(id === 'dash') { updateGrad(); updateFills(); } }
         function goDash() { show('dash'); }
+        function goSub(n) { curSub = n; document.getElementById('sub-title').innerText = n; show('sub-page'); setTab('Notes'); }
 
-        function setTab(t) {
-            curTab = t;
-            document.getElementById('editor').innerText = localStorage.getItem(curSub + t) || `Enter ${t} for ${curSub}...`; //
-        }
-
-        function save() { localStorage.setItem(curSub + curTab, document.getElementById('editor').innerText); } //
-
-        function doDrive() {
-            let l = localStorage.getItem(curSub + 'DRIVE') || prompt("Drive Link:"); //
-            if(l) { localStorage.setItem(curSub + 'DRIVE', l); window.open(l, '_blank'); }
-        }
-
-        function doPortal() {
-            let p = localStorage.getItem('PORTAL_URL') || prompt("Enter Student Portal URL:"); //
-            if(p) { localStorage.setItem('PORTAL_URL', p); window.open(p, '_blank'); }
-        }
-
-        function setGrad() {
-            const d = prompt("Enter Graduation (YYYY-MM-DD):"); //
-            if(d) { localStorage.setItem('gradDate', d); updateGrad(); }
-        }
-
-        function updateGrad() {
-            const d = localStorage.getItem('gradDate'); //
-            if(d) {
-                const diff = Math.ceil((new Date(d) - new Date()) / 86400000); //
-                document.getElementById('grad-counter').innerText = `${diff} days before Graduation!`;
+        // PROGRESS FILLING & REMAINING TIME
+        function handleBtnTap(btn, name) {
+            const start = btn.dataset.start.split(':').map(Number); const end = btn.dataset.end.split(':').map(Number);
+            const now = new Date(); const curr = now.getHours() * 60 + now.getMinutes();
+            const sTime = start[0]*60 + start[1]; const eTime = end[0]*60 + end[1];
+            if (curr >= sTime && curr <= eTime) {
+                const rem = eTime - curr; alert(`${name}: ${Math.floor(rem/60)}h ${rem%60}m remaining.`);
             }
+            goSub(name);
         }
+        function updateFills() {
+            const now = new Date(); const curr = now.getHours() * 60 + now.getMinutes();
+            document.querySelectorAll('.gold-btn').forEach(btn => {
+                const start = btn.dataset.start.split(':').map(Number); const end = btn.dataset.end.split(':').map(Number);
+                const s = start[0]*60 + start[1]; const e = end[0]*60 + end[1];
+                let prog = 0; let bar = btn.querySelector('.fill-bar');
+                if (curr >= s && curr <= e) { prog = ((curr - s) / (e - s)) * 100; bar.classList.remove('complete'); }
+                else if (curr > e) { prog = 100; bar.classList.add('complete'); }
+                bar.style.width = prog + '%';
+            });
+        }
+
+        // TABS & EDITOR
+        function setTab(t) {
+            curTab = t; const ed = document.getElementById('editor'); const tools = document.getElementById('editor-tools'); const gui = document.getElementById('grade-ui');
+            if (t === 'Grades') { ed.style.display = 'none'; tools.style.display = 'none'; gui.style.display = 'block'; loadGrades(); }
+            else { ed.style.display = 'block'; tools.style.display = 'flex'; gui.style.display = 'none'; ed.innerHTML = localStorage.getItem(curSub + t) || `Start ${t}...`; }
+        }
+        function save() { localStorage.setItem(curSub + curTab, document.getElementById('editor').innerHTML); }
+        function addChecklist() { document.getElementById('editor').innerHTML += `<div class="task"><input type="checkbox" onclick="this.parentElement.classList.toggle('checked'); save()"> New Task</div>`; }
+        function triggerImg() { document.getElementById('img-input').click(); }
+        function insertImg() { const file = document.getElementById('img-input').files[0]; const reader = new FileReader(); reader.onload = (e) => { document.execCommand('insertImage', false, e.target.result); save(); }; if(file) reader.readAsDataURL(file); }
+
+        // GRADE TRACKER
+        function addGradeRow(cat='', w=0, s=0) {
+            const row = document.createElement('div'); row.className = 'grade-entry'; row.style = "display:grid; grid-template-columns: 2fr 1fr 1fr; gap:5px; margin-bottom:8px;";
+            row.innerHTML = `<input type="text" placeholder="Cat" value="${cat}" oninput="saveGrades()"><input type="number" placeholder="W%" value="${weight}" oninput="saveGrades()"><input type="number" placeholder="Score" value="${score}" oninput="saveGrades()">`;
+            document.getElementById('grade-rows').appendChild(row);
+        }
+        function saveGrades() {
+            let data = []; let totalS = 0; let totalW = 0;
+            document.querySelectorAll('.grade-entry').forEach(row => {
+                const ins = row.querySelectorAll('input'); const w = parseFloat(ins[1].value)||0; const s = parseFloat(ins[2].value)||0;
+                data.push({c:ins[0].value, w, s}); totalW += w; totalS += (s * (w/100));
+            });
+            const disp = document.getElementById('final-calc');
+            disp.innerText = totalS.toFixed(2) + "%";
+            disp.style.color = (totalW !== 100 && totalW > 0) ? "red" : "var(--green)";
+            localStorage.setItem(curSub + '_GRADES', JSON.stringify(data));
+        }
+        function loadGrades() {
+            document.getElementById('grade-rows').innerHTML = '';
+            const saved = JSON.parse(localStorage.getItem(curSub + '_GRADES') || '[]');
+            if (saved.length === 0) { addGradeRow('Quizzes', 40, 0); addGradeRow('Exams', 60, 0); }
+            else { saved.forEach(g => addGradeRow(g.c, g.w, g.s)); }
+            saveGrades();
+        }
+
+        // UTILITIES
+        function doPortal() { let p = localStorage.getItem('P_URL') || prompt("Portal URL:"); if(p) { localStorage.setItem('P_URL', p); window.open(p, '_blank'); } }
+        function doDrive() { let l = localStorage.getItem(curSub + 'D') || prompt("Drive Link:"); if(l) { localStorage.setItem(curSub + 'D', l); window.open(l, '_blank'); } }
+        function setGrad() { const d = prompt("Grad Date (YYYY-MM-DD):"); if(d) { localStorage.setItem('G', d); updateGrad(); } }
+        function updateGrad() { const d = localStorage.getItem('G'); if(d) { document.getElementById('grad-counter').innerText = `${Math.ceil((new Date(d)-new Date())/86400000)} days before Graduation!`; } }
+        setInterval(updateFills, 60000);
     </script>
 </body>
 </html>
