@@ -9,37 +9,38 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
         body { font-family: 'Arial Black', sans-serif; height: 100vh; width: 100vw; overflow: hidden; background: #000; }
         
-        /* THEME BACKGROUND */
         .bg-fixed { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: linear-gradient(rgba(0,0,0,0.59), rgba(0,0,0,0.59)), url('image_992624.jpg'); 
             background-size: cover; background-position: center; z-index: -1;
         }
 
-        /* PAGE ISOLATION LOGIC */
-        .page { display: none; height: 100vh; width: 100vw; flex-direction: column; align-items: center; padding: 40px 20px; text-align: center; }
+        .page { display: none; height: 100vh; width: 100vw; flex-direction: column; align-items: center; padding: 30px 20px; text-align: center; }
         .page.active { display: flex; }
 
-        /* LOCK SCREEN (Mock 1) */
+        /* LOCK SCREEN */
         .dot { width: 12px; height: 12px; border: 2px solid white; border-radius: 50%; margin: 0 5px; }
         .dot.filled { background: white; }
         .keypad { display: grid; grid-template-columns: repeat(3, 80px); gap: 15px; margin-top: 20px; }
         .key { width: 80px; height: 80px; border: 2px solid var(--gold); border-radius: 50%; color: var(--gold); background: none; font-size: 28px; font-weight: bold; }
 
-        /* MAIN DASHBOARD (Mock 2) */
-        .header-text { color: white; font-size: 45px; margin: 15px 0; line-height: 0.8; text-transform: uppercase; }
+        /* MAIN DASHBOARD */
+        .header-text { color: white; font-size: 45px; margin: 10px 0; line-height: 0.8; text-transform: uppercase; }
         .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
         .gold-btn { background: var(--gold); color: white; border: none; border-radius: 12px; font-size: 18px; font-weight: 900; padding: 20px 5px; box-shadow: 0 4px 0 #b38600; }
         .wide { grid-column: span 2; font-size: 22px; }
-        .green-btn { background: var(--green); color: white; border: none; border-radius: 20px; font-size: 16px; font-weight: 900; padding: 12px 5px; margin-top: 10px; width: 100%; }
+        
+        /* Centered Utility Section */
+        .utility-section { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 15px; }
+        .green-btn { background: var(--green); color: white; border: none; border-radius: 20px; font-size: 16px; font-weight: 900; padding: 12px 25px; width: 85%; box-shadow: 0 3px 0 #689f38; }
 
-        /* SUBJECT PAGE (Mock 3) */
+        /* SUBJECT PAGE */
         .sub-header { color: white; font-size: 32px; margin-bottom: 20px; }
         .tab-row { display: flex; gap: 8px; width: 100%; justify-content: center; }
         .tab-btn { background: var(--gold); color: white; padding: 8px 15px; border-radius: 8px; border: none; font-weight: bold; font-size: 14px; }
         .editor-container { background: white; width: 100%; border-radius: 15px; margin-top: 15px; flex-grow: 1; padding: 15px; text-align: left; overflow-y: auto; }
-        .bottom-btns { display: flex; gap: 10px; width: 100%; margin-top: 15px; margin-bottom: 20px; }
-        .grad-text { color: var(--green); font-size: 18px; margin-top: auto; padding-bottom: 10px; }
+        .bottom-btns { display: flex; gap: 10px; width: 100%; margin-top: 15px; margin-bottom: 10px; }
+        .grad-text { color: var(--green); font-size: 18px; margin-top: auto; padding-bottom: 15px; }
     </style>
 </head>
 <body>
@@ -60,7 +61,7 @@
     </div>
 
     <div id="dash" class="page">
-        <img src="image_62b0e5.png" width="80" alt="Logo">
+        <img src="image_62b0e5.png" width="80" alt="Logo" onclick="doPortal()" style="cursor: pointer;">
         <h1 class="header-text">Class<br>Schedule</h1>
         <div class="btn-grid">
             <button class="gold-btn wide" onclick="goSub('Competency Appraisal')">Competency Appraisal</button>
@@ -70,17 +71,19 @@
             <button class="gold-btn" onclick="goSub('Masining na Pagpapahayag')">Retorika</button>
             <button class="gold-btn" onclick="goSub('Ethics')">Ethics</button>
             <button class="gold-btn" onclick="goSub('Life and Works of Rizal')">Rizal</button>
-            <div class="btn-grid">
-                <button class="green-btn" onclick="goSub('Exit Clearance')">Exit Clearance</button>
-                <button class="green-btn" onclick="goSub('General Notes')">General Notes</button>
-            </div>
         </div>
-        <p class="grad-text">244 days before Graduation!</p>
+        
+        <div class="utility-section">
+            <button class="green-btn" onclick="goSub('Exit Clearance')">Exit Clearance</button>
+            <button class="green-btn" onclick="goSub('General Notes')">General Notes</button>
+        </div>
+        
+        <p class="grad-text" id="grad-counter" onclick="setGrad()">244 days before Graduation!</p>
     </div>
 
     <div id="sub-page" class="page">
         <button onclick="goDash()" style="align-self: flex-start; background:red; color:white; border:none; padding:8px 15px; border-radius:5px; font-weight:bold;">Back</button>
-        <img src="image_62b0e5.png" width="60" style="margin-top: -35px;" alt="Logo">
+        <img src="image_62b0e5.png" width="60" style="margin-top: -35px;" alt="Logo" onclick="doPortal()">
         <h2 id="sub-title" class="sub-header">Subject Name</h2>
         <div class="tab-row">
             <button class="tab-btn" onclick="setTab('Notes')">Notes</button>
@@ -89,14 +92,14 @@
         </div>
         <div id="editor" class="editor-container" contenteditable="true" oninput="save()">Start typing...</div>
         <div class="bottom-btns">
-            <button class="green-btn" onclick="setTab('History')">History</button>
-            <button class="green-btn" onclick="setTab('Grades')">Grade Tracker</button>
+            <button class="green-btn" style="width:50%" onclick="setTab('History')">History</button>
+            <button class="green-btn" style="width:50%" onclick="setTab('Grades')">Grade Tracker</button>
         </div>
     </div>
 
     <script>
         let pin = "";
-        const secret = "2113";
+        const secret = "2113"; //
         let curSub = "";
         let curTab = "Notes";
 
@@ -114,6 +117,7 @@
         function show(id) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(id).classList.add('active');
+            if(id === 'dash') updateGrad();
         }
 
         function goSub(name) {
@@ -127,14 +131,32 @@
 
         function setTab(t) {
             curTab = t;
-            document.getElementById('editor').innerText = localStorage.getItem(curSub + t) || `Enter ${t}...`;
+            document.getElementById('editor').innerText = localStorage.getItem(curSub + t) || `Enter ${t} for ${curSub}...`; //
         }
 
-        function save() { localStorage.setItem(curSub + curTab, document.getElementById('editor').innerText); }
+        function save() { localStorage.setItem(curSub + curTab, document.getElementById('editor').innerText); } //
 
         function doDrive() {
-            let l = localStorage.getItem(curSub + 'DRIVE') || prompt("Drive Link:");
+            let l = localStorage.getItem(curSub + 'DRIVE') || prompt("Drive Link:"); //
             if(l) { localStorage.setItem(curSub + 'DRIVE', l); window.open(l, '_blank'); }
+        }
+
+        function doPortal() {
+            let p = localStorage.getItem('PORTAL_URL') || prompt("Enter Student Portal URL:"); //
+            if(p) { localStorage.setItem('PORTAL_URL', p); window.open(p, '_blank'); }
+        }
+
+        function setGrad() {
+            const d = prompt("Enter Graduation (YYYY-MM-DD):"); //
+            if(d) { localStorage.setItem('gradDate', d); updateGrad(); }
+        }
+
+        function updateGrad() {
+            const d = localStorage.getItem('gradDate'); //
+            if(d) {
+                const diff = Math.ceil((new Date(d) - new Date()) / 86400000); //
+                document.getElementById('grad-counter').innerText = `${diff} days before Graduation!`;
+            }
         }
     </script>
 </body>
