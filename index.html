@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Sir Lenard Dashboard</title>
     <style>
         :root { --gold: #fbc02d; --gold-dark: #b38600; --green: #8bc34a; --done-green: rgba(46, 125, 50, 0.7); }
@@ -39,24 +38,20 @@
         .fill-bar.complete { background: var(--done-green); }
         .btn-text { position: relative; z-index: 2; }
         .wide { grid-column: span 2; font-size: 20px; }
-        .utility-section { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 10px; }
         .green-btn { background: var(--green); color: white; border: none; border-radius: 20px; font-size: 15px; font-weight: 900; padding: 10px 25px; width: 85%; box-shadow: 0 3px 0 #689f38; }
 
-        /* EDITOR & TABS */
-        .tab-row { display: flex; gap: 8px; width: 100%; justify-content: center; margin-bottom: 10px; }
-        .tab-btn { background: var(--gold); color: white; padding: 8px 15px; border-radius: 8px; border: none; font-weight: bold; font-size: 14px; }
-        .editor-container { background: white; width: 100%; border-radius: 15px; flex-grow: 1; padding: 15px; text-align: left; overflow-y: auto; color: #333; font-family: sans-serif; }
-        .toolbar { display: flex; flex-wrap: wrap; gap: 5px; background: rgba(255,255,255,0.2); padding: 8px; border-radius: 10px; margin-bottom: 10px; width: 100%; justify-content: center; }
-        .tool-btn { background: var(--gold); border: none; color: white; padding: 5px 10px; border-radius: 5px; font-size: 12px; font-weight: bold; }
-        
-        /* SKETCH LAYER */
+        /* KEEP-STYLE TILES */
+        .editor-container { width: 100%; flex-grow: 1; overflow-y: auto; padding: 10px 0; }
+        .note-tile { background: white; border-radius: 12px; margin-bottom: 10px; overflow: hidden; text-align: left; box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
+        .tile-header { background: #f1f3f4; padding: 12px; font-weight: bold; color: #333; display: flex; justify-content: space-between; border-bottom: 1px solid #ddd; }
+        .tile-content { padding: 15px; color: #333; font-family: sans-serif; outline: none; min-height: 40px; }
+
+        /* SKETCH & TOOLS */
         #sketch-layer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 3000; }
         #canvas { width: 100%; height: 100%; touch-action: none; }
+        .toolbar { display: flex; flex-wrap: wrap; gap: 5px; background: rgba(255,255,255,0.2); padding: 8px; border-radius: 10px; margin-bottom: 10px; width: 100%; justify-content: center; }
+        .tool-btn { background: var(--gold); border: none; color: white; padding: 8px 12px; border-radius: 5px; font-size: 12px; font-weight: bold; }
 
-        /* CHECKLIST */
-        .task { display: flex; align-items: center; gap: 10px; margin: 5px 0; }
-        .task.checked { text-decoration: line-through; color: #888; }
-        
         .grad-text { color: var(--green); font-size: 16px; margin-top: auto; padding-bottom: 10px; }
     </style>
 </head>
@@ -64,7 +59,7 @@
     <div class="bg-fixed"></div>
 
     <div id="lock" class="page active">
-        <img src="image_62b0e5.png" width="140" alt="Logo">
+        <img src="image_62b0e5.png" width="140" alt="CvSU Logo">
         <h1 style="color:white; margin: 15px 0;">Welcome, sir!</h1>
         <div style="display:flex; margin-bottom: 15px;" id="dots">
             <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
@@ -103,42 +98,39 @@
                 <div class="fill-bar"></div><span class="btn-text">Rizal</span>
             </button>
         </div>
-        <div class="utility-section">
+        <div style="width:100%; display:flex; flex-direction:column; align-items:center; gap:8px; margin-top:10px;">
             <button class="green-btn" onclick="goSub('Exit Clearance')">Exit Clearance</button>
             <button class="green-btn" onclick="goSub('General Notes')">General Notes</button>
         </div>
-        <p class="grad-text" id="grad-counter" onclick="setGrad()">244 days before Graduation!</p>
+        <p class="grad-text" id="grad-counter" onclick="setGrad()">Set Graduation Date</p>
     </div>
 
     <div id="sub-page" class="page">
         <button onclick="goDash()" style="align-self:flex-start; background:red; color:white; border:none; padding:8px 15px; border-radius:5px; font-weight:bold;">Back</button>
-        <h2 id="sub-title" style="color:white; margin:10px 0; font-size:28px;">Subject</h2>
+        <h2 id="sub-title" style="color:white; margin:10px 0; font-size:24px;">Subject</h2>
         
-        <div class="tab-row">
+        <div style="display:flex; gap:8px; margin-bottom:10px;">
             <button class="tab-btn" onclick="setTab('Notes')">Notes</button>
             <button class="tab-btn" onclick="setTab('Reminders')">Reminders</button>
             <button class="tab-btn" onclick="doDrive()">Files</button>
         </div>
 
         <div id="editor-tools" class="toolbar">
-            <button class="tool-btn" onclick="addChecklist()">Checklist</button>
-            <button class="tool-btn" onclick="triggerImg()">Image</button>
+            <button class="tool-btn" onclick="addTile()">+ Add Card</button>
             <button class="tool-btn" onclick="openSketch()">Sketch</button>
         </div>
-        <input type="file" id="img-input" style="display:none;" accept="image/*" onchange="insertImg()">
 
-        <div id="editor" class="editor-container" contenteditable="true" oninput="save()"></div>
+        <div id="editor" class="editor-container"></div>
 
-        <div id="grade-ui" style="display:none; width:100%; background:white; padding:15px; border-radius:15px; overflow-y:auto;">
-            <h3 style="margin-bottom:10px;">Weighted Grades</h3>
+        <div id="grade-ui" style="display:none; width:100%; background:white; padding:15px; border-radius:15px;">
             <div id="grade-rows"></div>
-            <button class="tool-btn" style="margin-top:10px" onclick="addGradeRow()">+ Add Category</button>
+            <button class="tool-btn" onclick="addGradeRow()">+ Category</button>
             <div style="margin-top:15px; font-weight:bold; color:var(--green); font-size:22px;">
                 Total: <span id="final-calc">0.00%</span>
             </div>
         </div>
 
-        <div class="bottom-btns" style="display:flex; gap:10px; width:100%; margin-top:10px;">
+        <div style="display:flex; gap:10px; width:100%; margin-top:10px;">
             <button class="green-btn" style="width:50%" onclick="setTab('History')">History</button>
             <button class="green-btn" style="width:50%" onclick="setTab('Grades')">Grades</button>
         </div>
@@ -147,8 +139,8 @@
     <div id="sketch-layer">
         <canvas id="canvas"></canvas>
         <div style="position:absolute; bottom:20px; left:50%; transform:translateX(-50%); display:flex; gap:10px;">
-            <button onclick="saveSketch()" style="background:var(--green); color:white; padding:15px; border:none; border-radius:10px; font-weight:bold;">SAVE SKETCH</button>
-            <button onclick="closeSketch()" style="background:red; color:white; padding:15px; border:none; border-radius:10px; font-weight:bold;">CANCEL</button>
+            <button onclick="saveSketch()" style="background:var(--green); color:white; padding:15px; border-radius:10px; border:none; font-weight:bold;">SAVE</button>
+            <button onclick="closeSketch()" style="background:red; color:white; padding:15px; border-radius:10px; border:none; font-weight:bold;">CANCEL</button>
         </div>
     </div>
 
@@ -173,8 +165,9 @@
         canvas.addEventListener('touchend', () => drawing = false);
         function saveSketch() {
             const data = canvas.toDataURL();
-            document.getElementById('editor').innerHTML += `<img src="${data}" style="max-width:100%; margin-top:10px;">`;
-            save(); closeSketch();
+            const lastTile = document.querySelector('.note-tile:last-child .tile-content');
+            if (lastTile) { lastTile.innerHTML += `<img src="${data}" style="max-width:100%; margin-top:10px;">`; save(); }
+            closeSketch();
         }
         function closeSketch() { document.getElementById('sketch-layer').style.display = 'none'; }
 
@@ -192,43 +185,66 @@
         function goDash() { show('dash'); }
         function goSub(n) { curSub = n; document.getElementById('sub-title').innerText = n; show('sub-page'); setTab('Notes'); }
 
-        // PROGRESS FILLING & REMAINING TIME
+        // TILE LOGIC
+        function addTile(title = "New Card", content = "") {
+            const id = 'tile-' + Date.now();
+            const tile = document.createElement('div');
+            tile.className = 'note-tile';
+            tile.id = id;
+            tile.innerHTML = `
+                <div class="tile-header" onclick="toggleTile('${id}')">
+                    <span contenteditable="true" oninput="save()">${title}</span>
+                    <span>▼</span>
+                </div>
+                <div class="tile-content" contenteditable="true" oninput="save()">${content}</div>
+            `;
+            document.getElementById('editor').appendChild(tile);
+            save();
+        }
+        function toggleTile(id) {
+            const c = document.querySelector(`#${id} .tile-content`);
+            c.style.display = (c.style.display === "none") ? "block" : "none";
+        }
+
+        // TABS & PERSISTENCE
+        function setTab(t) {
+            curTab = t; const ed = document.getElementById('editor'); const tools = document.getElementById('editor-tools'); const gui = document.getElementById('grade-ui');
+            if (t === 'Grades') { ed.style.display = 'none'; tools.style.display = 'none'; gui.style.display = 'block'; loadGrades(); }
+            else { 
+                ed.style.display = 'block'; tools.style.display = 'flex'; gui.style.display = 'none'; ed.innerHTML = '';
+                const saved = JSON.parse(localStorage.getItem(curSub + t) || '[]');
+                if (saved.length === 0) { addTile("Welcome", "Start typing..."); } else { saved.forEach(i => addTile(i.title, i.content)); }
+            }
+        }
+        function save() {
+            const tiles = document.querySelectorAll('.note-tile');
+            let data = [];
+            tiles.forEach(t => { data.push({ title: t.querySelector('.tile-header span').innerText, content: t.querySelector('.tile-content').innerHTML }); });
+            localStorage.setItem(curSub + curTab, JSON.stringify(data));
+        }
+
+        // GRADES & PROGRESS
         function handleBtnTap(btn, name) {
             const start = btn.dataset.start.split(':').map(Number); const end = btn.dataset.end.split(':').map(Number);
             const now = new Date(); const curr = now.getHours() * 60 + now.getMinutes();
             const sTime = start[0]*60 + start[1]; const eTime = end[0]*60 + end[1];
-            if (curr >= sTime && curr <= eTime) {
-                const rem = eTime - curr; alert(`${name}: ${Math.floor(rem/60)}h ${rem%60}m remaining.`);
-            }
+            if (curr >= sTime && curr <= eTime) { const rem = eTime - curr; alert(`${name}: ${Math.floor(rem/60)}h ${rem%60}m remaining.`); }
             goSub(name);
         }
         function updateFills() {
             const now = new Date(); const curr = now.getHours() * 60 + now.getMinutes();
             document.querySelectorAll('.gold-btn').forEach(btn => {
-                const start = btn.dataset.start.split(':').map(Number); const end = btn.dataset.end.split(':').map(Number);
-                const s = start[0]*60 + start[1]; const e = end[0]*60 + end[1];
-                let prog = 0; let bar = btn.querySelector('.fill-bar');
-                if (curr >= s && curr <= e) { prog = ((curr - s) / (e - s)) * 100; bar.classList.remove('complete'); }
-                else if (curr > e) { prog = 100; bar.classList.add('complete'); }
-                bar.style.width = prog + '%';
+                const s = btn.dataset.start.split(':').map(Number); const e = btn.dataset.end.split(':').map(Number);
+                const sT = s[0]*60+s[1]; const eT = e[0]*60+e[1];
+                let bar = btn.querySelector('.fill-bar'); let p = 0;
+                if (curr >= sT && curr <= eT) { p = ((curr-sT)/(eT-sT))*100; bar.classList.remove('complete'); }
+                else if (curr > eT) { p = 100; bar.classList.add('complete'); }
+                bar.style.width = p + '%';
             });
         }
-
-        // TABS & EDITOR
-        function setTab(t) {
-            curTab = t; const ed = document.getElementById('editor'); const tools = document.getElementById('editor-tools'); const gui = document.getElementById('grade-ui');
-            if (t === 'Grades') { ed.style.display = 'none'; tools.style.display = 'none'; gui.style.display = 'block'; loadGrades(); }
-            else { ed.style.display = 'block'; tools.style.display = 'flex'; gui.style.display = 'none'; ed.innerHTML = localStorage.getItem(curSub + t) || `Start ${t}...`; }
-        }
-        function save() { localStorage.setItem(curSub + curTab, document.getElementById('editor').innerHTML); }
-        function addChecklist() { document.getElementById('editor').innerHTML += `<div class="task"><input type="checkbox" onclick="this.parentElement.classList.toggle('checked'); save()"> New Task</div>`; }
-        function triggerImg() { document.getElementById('img-input').click(); }
-        function insertImg() { const file = document.getElementById('img-input').files[0]; const reader = new FileReader(); reader.onload = (e) => { document.execCommand('insertImage', false, e.target.result); save(); }; if(file) reader.readAsDataURL(file); }
-
-        // GRADE TRACKER
-        function addGradeRow(cat='', w=0, s=0) {
+        function addGradeRow(c='', w=0, s=0) {
             const row = document.createElement('div'); row.className = 'grade-entry'; row.style = "display:grid; grid-template-columns: 2fr 1fr 1fr; gap:5px; margin-bottom:8px;";
-            row.innerHTML = `<input type="text" placeholder="Cat" value="${cat}" oninput="saveGrades()"><input type="number" placeholder="W%" value="${weight}" oninput="saveGrades()"><input type="number" placeholder="Score" value="${score}" oninput="saveGrades()">`;
+            row.innerHTML = `<input type="text" placeholder="Cat" value="${c}" oninput="saveGrades()"><input type="number" placeholder="W%" value="${w}" oninput="saveGrades()"><input type="number" placeholder="Score" value="${s}" oninput="saveGrades()">`;
             document.getElementById('grade-rows').appendChild(row);
         }
         function saveGrades() {
@@ -237,20 +253,15 @@
                 const ins = row.querySelectorAll('input'); const w = parseFloat(ins[1].value)||0; const s = parseFloat(ins[2].value)||0;
                 data.push({c:ins[0].value, w, s}); totalW += w; totalS += (s * (w/100));
             });
-            const disp = document.getElementById('final-calc');
-            disp.innerText = totalS.toFixed(2) + "%";
-            disp.style.color = (totalW !== 100 && totalW > 0) ? "red" : "var(--green)";
+            const d = document.getElementById('final-calc'); d.innerText = totalS.toFixed(2) + "%"; d.style.color = (totalW !== 100 && totalW > 0) ? "red" : "var(--green)";
             localStorage.setItem(curSub + '_GRADES', JSON.stringify(data));
         }
         function loadGrades() {
             document.getElementById('grade-rows').innerHTML = '';
             const saved = JSON.parse(localStorage.getItem(curSub + '_GRADES') || '[]');
-            if (saved.length === 0) { addGradeRow('Quizzes', 40, 0); addGradeRow('Exams', 60, 0); }
-            else { saved.forEach(g => addGradeRow(g.c, g.w, g.s)); }
+            if (saved.length === 0) { addGradeRow('Quizzes', 40, 0); addGradeRow('Exams', 60, 0); } else { saved.forEach(g => addGradeRow(g.c, g.w, g.s)); }
             saveGrades();
         }
-
-        // UTILITIES
         function doPortal() { let p = localStorage.getItem('P_URL') || prompt("Portal URL:"); if(p) { localStorage.setItem('P_URL', p); window.open(p, '_blank'); } }
         function doDrive() { let l = localStorage.getItem(curSub + 'D') || prompt("Drive Link:"); if(l) { localStorage.setItem(curSub + 'D', l); window.open(l, '_blank'); } }
         function setGrad() { const d = prompt("Grad Date (YYYY-MM-DD):"); if(d) { localStorage.setItem('G', d); updateGrad(); } }
