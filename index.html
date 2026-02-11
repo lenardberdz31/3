@@ -7,40 +7,51 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>CvSU Dashboard</title>
     <style>
-        :root { --green: #006400; --gold: #FFD700; }
+        :root { --green: #006400; --gold: #FFD700; --white: #ffffff; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
         body { font-family: -apple-system, sans-serif; background: var(--green); height: 100vh; width: 100vw; overflow: hidden; }
         
         /* PIN Entry Screen */
-        #lock-screen { height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; position: relative; }
+        #lock-screen { height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; position: relative; }
         .logo-container img { width: 140px; height: 140px; transition: all 0.5s ease; }
-        .logo-container.break img { transform: scale(5); opacity: 0; filter: blur(15px); }
-        .pin-dots { height: 30px; color: white; font-size: 28px; letter-spacing: 10px; margin: 15px 0; }
-        .keypad { display: grid; grid-template-columns: repeat(3, 70px); gap: 12px; }
-        .key { width: 70px; height: 70px; border: 2px solid var(--gold); border-radius: 50%; color: white; background: none; font-size: 22px; font-weight: bold; }
+        .logo-container.break img { transform: scale(5) rotate(15deg); opacity: 0; filter: blur(15px); }
+        .pin-dots { height: 35px; color: white; font-size: 30px; letter-spacing: 12px; margin: 15px 0; font-weight: bold; }
+        .keypad { display: grid; grid-template-columns: repeat(3, 75px); gap: 12px; }
+        .key { width: 75px; height: 75px; border: 2px solid var(--gold); border-radius: 50%; color: white; background: none; font-size: 24px; font-weight: bold; }
+        .key:active { background: rgba(255, 215, 0, 0.2); }
 
-        /* Dashboard (Compact View) */
-        #main-app { display: none; background: #f2f2f2; height: 100vh; padding: 10px 15px; display: flex; flex-direction: column; }
-        .header { font-size: 24px; font-weight: 800; color: var(--green); text-align: center; margin: 5px 0; }
-        .grad-banner { background: var(--gold); color: var(--green); padding: 8px; border-radius: 10px; text-align: center; font-weight: 800; font-size: 14px; margin-bottom: 10px; }
+        /* Dashboard View */
+        #main-app { display: none; background: #f2f2f2; height: 100vh; width: 100vw; padding: 10px 15px; display: flex; flex-direction: column; }
+        .header { font-size: 26px; font-weight: 900; color: var(--green); text-align: center; margin: 5px 0; }
+        .grad-banner { background: var(--gold); color: var(--green); padding: 10px; border-radius: 12px; text-align: center; font-weight: 800; font-size: 15px; margin-bottom: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
         
-        /* Compact Schedule */
-        #schedule-list { flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; margin-bottom: 10px; }
-        .day-group { margin-bottom: 5px; }
-        .day-label { font-size: 14px; font-weight: 800; color: var(--green); text-transform: uppercase; border-bottom: 1px solid var(--gold); margin-bottom: 4px; }
+        /* Schedule List - Optimized for No-Scroll */
+        #schedule-list { flex-grow: 1; display: flex; flex-direction: column; justify-content: space-around; overflow: hidden; }
+        .day-group { margin-bottom: 2px; }
+        .day-label { font-size: 14px; font-weight: 800; color: var(--green); text-transform: uppercase; border-bottom: 2px solid var(--gold); margin-bottom: 4px; display: inline-block; padding-right: 10px; }
         
         .card { 
-            background: white; padding: 8px 12px; border-radius: 10px; margin-bottom: 4px; 
-            border-left: 6px solid var(--green); display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            background: white; padding: 10px 15px; border-radius: 12px; margin-bottom: 4px; 
+            border-left: 8px solid var(--green); display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.06); cursor: pointer;
         }
+        .card:active { background: #fafafa; transform: scale(0.98); }
         .card.faded { opacity: 0.5; filter: grayscale(1); }
-        .card-info b { font-size: 14px; display: block; color: #2c3e50; }
-        .card-info span { color: #7f8c8d; font-size: 12px; font-weight: 600; }
+        .card-info b { font-size: 15px; display: block; color: #333; }
+        .card-info span { color: #666; font-size: 12px; font-weight: 600; }
         
+        /* Subject Detail View */
+        #subject-view { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 2000; padding: 40px 20px; box-sizing: border-box; }
+        .view-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+        .tabs { display: flex; background: #eee; border-radius: 10px; margin-bottom: 20px; padding: 5px; }
+        .tab { flex: 1; padding: 10px; text-align: center; font-weight: bold; border-radius: 8px; font-size: 14px; }
+        .tab.active { background: var(--green); color: white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
         /* Utility Buttons */
-        .footer-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: auto; padding-bottom: 15px; }
-        .footer-btn { background: var(--green); color: white; padding: 12px; border: none; border-radius: 12px; font-weight: bold; font-size: 13px; }
+        .footer-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding-bottom: 15px; margin-top: 5px; }
+        .footer-btn { background: var(--green); color: white; padding: 14px; border: none; border-radius: 14px; font-weight: bold; font-size: 14px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
     </style>
 </head>
 <body>
@@ -54,36 +65,36 @@
             <button class="key" onclick="press('1')">1</button><button class="key" onclick="press('2')">2</button><button class="key" onclick="press('3')">3</button>
             <button class="key" onclick="press('4')">4</button><button class="key" onclick="press('5')">5</button><button class="key" onclick="press('6')">6</button>
             <button class="key" onclick="press('7')">7</button><button class="key" onclick="press('8')">8</button><button class="key" onclick="press('9')">9</button>
-            <div style="width:70px"></div><button class="key" onclick="press('0')">0</button>
+            <div style="width:75px"></div><button class="key" onclick="press('0')">0</button>
         </div>
     </div>
 
-    <div id="main-app" style="display:none;">
+    <div id="main-app">
         <div class="header">Class Schedule</div>
         <div class="grad-banner" id="grad-display" onclick="setGradDate()">Set Graduation Date</div>
         
         <div id="schedule-list">
             <div class="day-group">
                 <div class="day-label">Wed</div>
-                <div class="card" id="educ198"><div class="card-info"><b>EDUC 198</b><span>09:00 - 3:00</span></div><input type="checkbox" onclick="toggleFade('educ198')"></div>
+                <div class="card" id="educ198" onclick="openSubject('EDUC 198 - Appraisal 2')"><div class="card-info"><b>EDUC 198</b><span>09:00 - 3:00</span></div><input type="checkbox" onclick="event.stopPropagation(); toggleFade('educ198')"></div>
             </div>
 
             <div class="day-group">
                 <div class="day-label">Thu</div>
-                <div class="card" id="gned01"><div class="card-info"><b>GNED 01</b><span>07:00 - 9:00</span></div><input type="checkbox" onclick="toggleFade('gned01')"></div>
-                <div class="card" id="gned10"><div class="card-info"><b>GNED 10</b><span>09:00 - 11:00</span></div><input type="checkbox" onclick="toggleFade('gned10')"></div>
+                <div class="card" id="gned01" onclick="openSubject('GNED 01 - Art App')"><div class="card-info"><b>GNED 01</b><span>07:00 - 9:00</span></div><input type="checkbox" onclick="event.stopPropagation(); toggleFade('gned01')"></div>
+                <div class="card" id="gned10" onclick="openSubject('GNED 10 - Gen and Soc')"><div class="card-info"><b>GNED 10</b><span>09:00 - 11:00</span></div><input type="checkbox" onclick="event.stopPropagation(); toggleFade('gned10')"></div>
             </div>
 
             <div class="day-group">
                 <div class="day-label">Fri</div>
-                <div class="card" id="gned07"><div class="card-info"><b>GNED 07</b><span>07:00 - 9:00</span></div><input type="checkbox" onclick="toggleFade('gned07')"></div>
-                <div class="card" id="gned13"><div class="card-info"><b>GNED 13</b><span>09:00 - 11:00</span></div><input type="checkbox" onclick="toggleFade('gned13')"></div>
+                <div class="card" id="gned07" onclick="openSubject('GNED 07 - Contemp')"><div class="card-info"><b>GNED 07</b><span>07:00 - 9:00</span></div><input type="checkbox" onclick="event.stopPropagation(); toggleFade('gned07')"></div>
+                <div class="card" id="gned13" onclick="openSubject('GNED 13 - Retorika')"><div class="card-info"><b>GNED 13</b><span>09:00 - 11:00</span></div><input type="checkbox" onclick="event.stopPropagation(); toggleFade('gned13')"></div>
             </div>
 
             <div class="day-group">
                 <div class="day-label">Sat</div>
-                <div class="card" id="gned02"><div class="card-info"><b>GNED 02</b><span>07:00 - 9:00</span></div><input type="checkbox" onclick="toggleFade('gned02')"></div>
-                <div class="card" id="gned09"><div class="card-info"><b>GNED 09</b><span>09:00 - 11:00</span></div><input type="checkbox" onclick="toggleFade('gned09')"></div>
+                <div class="card" id="gned02" onclick="openSubject('GNED 02 - Ethics')"><div class="card-info"><b>GNED 02</b><span>07:00 - 9:00</span></div><input type="checkbox" onclick="event.stopPropagation(); toggleFade('gned02')"></div>
+                <div class="card" id="gned09" onclick="openSubject('GNED 09 - Rizal')"><div class="card-info"><b>GNED 09</b><span>09:00 - 11:00</span></div><input type="checkbox" onclick="event.stopPropagation(); toggleFade('gned09')"></div>
             </div>
         </div>
         
@@ -93,9 +104,30 @@
         </div>
     </div>
 
+    <div id="subject-view">
+        <div class="view-header">
+            <h2 id="view-title" style="color:var(--green)">Subject</h2>
+            <button onclick="closeSubject()" style="border:none; background:none; font-size:24px; font-weight:bold; color:var(--green)">✕</button>
+        </div>
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab(0)">Checklist</div>
+            <div class="tab" onclick="switchTab(1)">Grades</div>
+            <div class="tab" onclick="switchTab(2)">History</div>
+        </div>
+        <div id="tab-0" class="tab-content active">
+            <div style="display:flex; gap:10px; margin-bottom:15px;">
+                <input type="text" id="task-in" placeholder="New Task..." style="flex:1; padding:12px; border-radius:10px; border:1px solid #ddd;">
+                <button style="background:var(--green); color:white; border:none; padding:10px 15px; border-radius:10px;" onclick="addTask()">Add</button>
+            </div>
+            <ul id="task-list" style="list-style:none;"></ul>
+        </div>
+        <div id="tab-1" class="tab-content"><h3>Grade Predictor</h3><p>Predictor logic is ready.</p></div>
+        <div id="tab-2" class="tab-content"><h3>History Archive</h3><p>Sunday archive will appear here.</p></div>
+    </div>
+
     <script>
         let pin = "";
-        const correct = "2113"; // PIN
+        const correct = "2113"; // Your PIN
 
         function press(n) {
             if(pin.length < 4) {
@@ -110,6 +142,50 @@
                             document.getElementById('main-app').style.display = 'flex';
                         }, 600);
                     } else {
+                        alert("Wrong PIN"); pin = ""; document.getElementById('pin-display').innerText = "";
+                    }
+                }
+            }
+        }
+
+        function toggleFade(id) { document.getElementById(id).classList.toggle('faded'); }
+
+        function openSubject(title) {
+            document.getElementById('view-title').innerText = title;
+            document.getElementById('subject-view').style.display = 'block';
+        }
+
+        function closeSubject() { document.getElementById('subject-view').style.display = 'none'; }
+
+        function switchTab(i) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(`tab-${i}`).classList.add('active');
+            document.querySelectorAll('.tab')[i].classList.add('active');
+        }
+
+        function setGradDate() {
+            const d = prompt("Graduation (YYYY-MM-DD):");
+            if(d) { localStorage.setItem('grad', d); updateGrad(); }
+        }
+
+        function updateGrad() {
+            const d = localStorage.getItem('grad');
+            if(d) {
+                const diff = Math.ceil((new Date(d) - new Date()) / (86400000));
+                document.getElementById('grad-display').innerText = `Graduation Countdown: ${diff} Days`;
+            }
+        }
+
+        function handlePortal() {
+            let u = localStorage.getItem('pUrl') || prompt("Portal Link:");
+            if(u) { localStorage.setItem('pUrl', u); window.open(u, '_blank'); }
+        }
+
+        updateGrad();
+    </script>
+</body>
+</html>
                         alert("Wrong PIN"); pin = ""; document.getElementById('pin-display').innerText = "";
                     }
                 }
