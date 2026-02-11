@@ -3,155 +3,139 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>CvSU Schedule</title>
+    <title>Sir Lenard Dashboard</title>
     <style>
         :root { --gold: #fbc02d; --green: #8bc34a; --white: #ffffff; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; padding: 0; background: #000; font-family: 'Arial Black', sans-serif; overflow: hidden; height: 100vh; width: 100vw; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+        body { font-family: 'Arial Black', sans-serif; height: 100vh; width: 100vw; overflow: hidden; background: #000; }
         
-        /* BACKGROUND LAYER */
-        .bg-overlay { 
+        /* THEME BACKGROUND */
+        .bg-fixed { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: linear-gradient(rgba(0,0,0,0.59), rgba(0,0,0,0.59)), url('image_992624.jpg'); 
             background-size: cover; background-position: center; z-index: -1;
         }
 
-        /* LOCK SCREEN */
-        #lock-screen { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: white; }
-        .pin-dots { display: flex; gap: 10px; margin: 20px 0; }
-        .dot { width: 12px; height: 12px; border: 2px solid white; border-radius: 50%; }
+        /* PAGE ISOLATION LOGIC */
+        .page { display: none; height: 100vh; width: 100vw; flex-direction: column; align-items: center; padding: 40px 20px; text-align: center; }
+        .page.active { display: flex; }
+
+        /* LOCK SCREEN (Mock 1) */
+        .dot { width: 12px; height: 12px; border: 2px solid white; border-radius: 50%; margin: 0 5px; }
         .dot.filled { background: white; }
-        .keypad { display: grid; grid-template-columns: repeat(3, 85px); gap: 15px; }
-        .key { width: 85px; height: 85px; border: 3px solid var(--gold); border-radius: 50%; color: var(--gold); background: none; font-size: 32px; font-weight: bold; }
+        .keypad { display: grid; grid-template-columns: repeat(3, 80px); gap: 15px; margin-top: 20px; }
+        .key { width: 80px; height: 80px; border: 2px solid var(--gold); border-radius: 50%; color: var(--gold); background: none; font-size: 28px; font-weight: bold; }
 
-        /* MAIN DASHBOARD */
-        #main-app { display: none; height: 100%; padding: 40px 20px; flex-direction: column; align-items: center; }
-        .header-title { color: white; font-size: 48px; text-align: center; margin-bottom: 30px; line-height: 0.9; }
-        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; }
-        .wide-btn { grid-column: span 2; background: var(--gold); height: 75px; border-radius: 15px; border: none; font-size: 24px; color: white; font-weight: 900; box-shadow: 0 4px 0 #c49000; }
-        .sub-btn { background: var(--gold); height: 75px; border-radius: 15px; border: none; font-size: 20px; color: white; font-weight: 900; box-shadow: 0 4px 0 #c49000; }
-        .util-btn { background: var(--green); height: 55px; border-radius: 25px; border: none; font-size: 18px; color: white; font-weight: 900; }
+        /* MAIN DASHBOARD (Mock 2) */
+        .header-text { color: white; font-size: 45px; margin: 15px 0; line-height: 0.8; text-transform: uppercase; }
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
+        .gold-btn { background: var(--gold); color: white; border: none; border-radius: 12px; font-size: 18px; font-weight: 900; padding: 20px 5px; box-shadow: 0 4px 0 #b38600; }
+        .wide { grid-column: span 2; font-size: 22px; }
+        .green-btn { background: var(--green); color: white; border: none; border-radius: 20px; font-size: 16px; font-weight: 900; padding: 12px 5px; margin-top: 10px; width: 100%; }
 
-        /* SUBJECT VIEW */
-        #subject-view { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; flex-direction: column; align-items: center; padding-top: 50px; }
-        .nav-row { display: flex; gap: 10px; margin-top: 20px; }
-        .nav-btn { background: var(--gold); color: white; padding: 10px 15px; border-radius: 8px; border: none; font-weight: bold; }
-        .text-area { width: 90%; background: white; border-radius: 15px; padding: 15px; margin-top: 20px; flex-grow: 0.5; overflow-y: auto; }
+        /* SUBJECT PAGE (Mock 3) */
+        .sub-header { color: white; font-size: 32px; margin-bottom: 20px; }
+        .tab-row { display: flex; gap: 8px; width: 100%; justify-content: center; }
+        .tab-btn { background: var(--gold); color: white; padding: 8px 15px; border-radius: 8px; border: none; font-weight: bold; font-size: 14px; }
+        .editor-container { background: white; width: 100%; border-radius: 15px; margin-top: 15px; flex-grow: 1; padding: 15px; text-align: left; overflow-y: auto; }
+        .bottom-btns { display: flex; gap: 10px; width: 100%; margin-top: 15px; margin-bottom: 20px; }
+        .grad-text { color: var(--green); font-size: 18px; margin-top: auto; padding-bottom: 10px; }
     </style>
 </head>
 <body>
-    <div class="bg-overlay"></div>
+    <div class="bg-fixed"></div>
 
-    <div id="lock-screen">
-        <img src="image_62b0e5.png" width="160" alt="Logo">
-        <h1 style="font-size: 42px; margin: 20px 0;">Welcome, sir!</h1>
-        <div class="pin-dots" id="pin-dots">
+    <div id="lock" class="page active">
+        <img src="image_62b0e5.png" width="150" alt="CvSU Logo">
+        <h1 style="color:white; margin: 20px 0;">Welcome, sir!</h1>
+        <div style="display:flex; margin-bottom: 20px;" id="dots">
             <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
         </div>
         <div class="keypad">
-            <button class="key" onclick="press(1)">1</button><button class="key" onclick="press(2)">2</button><button class="key" onclick="press(3)">3</button>
-            <button class="key" onclick="press(4)">4</button><button class="key" onclick="press(5)">5</button><button class="key" onclick="press(6)">6</button>
-            <button class="key" onclick="press(7)">7</button><button class="key" onclick="press(8)">8</button><button class="key" onclick="press(9)">9</button>
-            <button class="key" style="grid-column: 2" onclick="press(0)">0</button>
+            <button class="key" onclick="tap(1)">1</button><button class="key" onclick="tap(2)">2</button><button class="key" onclick="tap(3)">3</button>
+            <button class="key" onclick="tap(4)">4</button><button class="key" onclick="tap(5)">5</button><button class="key" onclick="tap(6)">6</button>
+            <button class="key" onclick="tap(7)">7</button><button class="key" onclick="tap(8)">8</button><button class="key" onclick="tap(9)">9</button>
+            <button class="key" style="grid-column: 2" onclick="tap(0)">0</button>
         </div>
     </div>
 
-    <div id="main-app">
+    <div id="dash" class="page">
         <img src="image_62b0e5.png" width="80" alt="Logo">
-        <h1 class="header-title">Class<br>Schedule</h1>
-        
+        <h1 class="header-text">Class<br>Schedule</h1>
         <div class="btn-grid">
-            <button class="wide-btn" onclick="openSub('Competency Appraisal')">Competency Appraisal</button>
-            <button class="sub-btn" onclick="openSub('Art Appreciation')">Art App</button>
-            <button class="sub-btn" onclick="openSub('Gender and Society')">Gen Soc</button>
-            <button class="sub-btn" onclick="openSub('The Contemporary World')">Contemp</button>
-            <button class="sub-btn" onclick="openSub('Masining na Pagpapahayag')">Retorika</button>
-            <button class="sub-btn" onclick="openSub('Ethics')">Ethics</button>
-            <button class="sub-btn" onclick="openSub('Life and Works of Rizal')">Rizal</button>
-            <button class="util-btn" onclick="openSub('Exit Clearance')">Exit Clearance</button>
-            <button class="util-btn" onclick="openSub('General Notes')">General Notes</button>
+            <button class="gold-btn wide" onclick="goSub('Competency Appraisal')">Competency Appraisal</button>
+            <button class="gold-btn" onclick="goSub('Art Appreciation')">Art App</button>
+            <button class="gold-btn" onclick="goSub('Gender and Society')">Gen Soc</button>
+            <button class="gold-btn" onclick="goSub('The Contemporary World')">Contemp</button>
+            <button class="gold-btn" onclick="goSub('Masining na Pagpapahayag')">Retorika</button>
+            <button class="gold-btn" onclick="goSub('Ethics')">Ethics</button>
+            <button class="gold-btn" onclick="goSub('Life and Works of Rizal')">Rizal</button>
+            <div class="btn-grid">
+                <button class="green-btn" onclick="goSub('Exit Clearance')">Exit Clearance</button>
+                <button class="green-btn" onclick="goSub('General Notes')">General Notes</button>
+            </div>
         </div>
-
-        <p id="grad-text" style="color: var(--green); font-size: 20px; margin-top: 30px; cursor: pointer;" onclick="setGrad()">244 days before Graduation!</p>
+        <p class="grad-text">244 days before Graduation!</p>
     </div>
 
-    <div id="subject-view">
-        <h1 id="view-title" style="color: white; text-align: center; width: 80%;">Subject</h1>
-        <div class="nav-row">
-            <button class="nav-btn" onclick="viewTab('notes')">Notes</button>
-            <button class="nav-btn" onclick="viewTab('reminders')">Reminders</button>
-            <button class="nav-btn" onclick="handleDrive()">Files</button>
+    <div id="sub-page" class="page">
+        <button onclick="goDash()" style="align-self: flex-start; background:red; color:white; border:none; padding:8px 15px; border-radius:5px; font-weight:bold;">Back</button>
+        <img src="image_62b0e5.png" width="60" style="margin-top: -35px;" alt="Logo">
+        <h2 id="sub-title" class="sub-header">Subject Name</h2>
+        <div class="tab-row">
+            <button class="tab-btn" onclick="setTab('Notes')">Notes</button>
+            <button class="tab-btn" onclick="setTab('Reminders')">Reminders</button>
+            <button class="tab-btn" onclick="doDrive()">Files</button>
         </div>
-        <div class="text-area" id="content-box" contenteditable="true" oninput="saveContent()">Type here...</div>
-        <div class="nav-row" style="margin-top: auto; margin-bottom: 40px;">
-            <button class="util-btn" style="width: 140px;" onclick="viewTab('history')">History</button>
-            <button class="util-btn" style="width: 140px;" onclick="viewTab('grades')">Grade Tracker</button>
+        <div id="editor" class="editor-container" contenteditable="true" oninput="save()">Start typing...</div>
+        <div class="bottom-btns">
+            <button class="green-btn" onclick="setTab('History')">History</button>
+            <button class="green-btn" onclick="setTab('Grades')">Grade Tracker</button>
         </div>
-        <button class="nav-btn" style="position: absolute; top: 20px; left: 20px; background: red;" onclick="closeSub()">Back</button>
     </div>
 
     <script>
         let pin = "";
-        const correctPin = "2113"; // Updated PIN
-        let currentSub = "";
-        let currentTab = "notes";
+        const secret = "2113";
+        let curSub = "";
+        let curTab = "Notes";
 
-        function press(n) {
+        function tap(n) {
             if(pin.length < 4) {
                 pin += n;
                 document.querySelectorAll('.dot')[pin.length-1].classList.add('filled');
                 if(pin.length === 4) {
-                    if(pin === correctPin) {
-                        document.getElementById('lock-screen').style.display = 'none';
-                        document.getElementById('main-app').style.display = 'flex';
-                    } else {
-                        alert("Wrong PIN"); pin = ""; 
-                        document.querySelectorAll('.dot').forEach(d => d.classList.remove('filled'));
-                    }
+                    if(pin === secret) { show('dash'); }
+                    else { alert("Wrong PIN"); pin = ""; document.querySelectorAll('.dot').forEach(d=>d.classList.remove('filled')); }
                 }
             }
         }
 
-        function openSub(name) {
-            currentSub = name;
-            document.getElementById('view-title').innerText = name;
-            document.getElementById('subject-view').style.display = 'flex';
-            viewTab('notes');
+        function show(id) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
         }
 
-        function closeSub() { document.getElementById('subject-view').style.display = 'none'; }
-
-        function viewTab(tab) {
-            currentTab = tab;
-            const key = `${currentSub}_${tab}`;
-            document.getElementById('content-box').innerText = localStorage.getItem(key) || `Enter ${tab} for ${currentSub}...`;
+        function goSub(name) {
+            curSub = name;
+            document.getElementById('sub-title').innerText = name;
+            show('sub-page');
+            setTab('Notes');
         }
 
-        function saveContent() {
-            const key = `${currentSub}_${currentTab}`;
-            localStorage.setItem(key, document.getElementById('content-box').innerText);
+        function goDash() { show('dash'); }
+
+        function setTab(t) {
+            curTab = t;
+            document.getElementById('editor').innerText = localStorage.getItem(curSub + t) || `Enter ${t}...`;
         }
 
-        function handleDrive() {
-            let link = localStorage.getItem(`${currentSub}_drive`) || prompt("Paste Google Drive Link:");
-            if(link) { localStorage.setItem(`${currentSub}_drive`, link); window.open(link, '_blank'); }
-        }
+        function save() { localStorage.setItem(curSub + curTab, document.getElementById('editor').innerText); }
 
-        function setGrad() {
-            const d = prompt("Enter Graduation (YYYY-MM-DD):");
-            if(d) localStorage.setItem('gradDate', d);
-            updateGrad();
+        function doDrive() {
+            let l = localStorage.getItem(curSub + 'DRIVE') || prompt("Drive Link:");
+            if(l) { localStorage.setItem(curSub + 'DRIVE', l); window.open(l, '_blank'); }
         }
-
-        function updateGrad() {
-            const d = localStorage.getItem('gradDate');
-            if(d) {
-                const diff = Math.ceil((new Date(d) - new Date()) / 86400000);
-                document.getElementById('grad-text').innerText = `${diff} days before Graduation!`;
-            }
-        }
-        updateGrad();
     </script>
 </body>
 </html>
