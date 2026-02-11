@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>CvSU Dashboard</title>
+    <style>
+        :root { --cvsu-green: #006400; --cvsu-gold: #FFD700; --bg: #fdfdfd; }
+        
+        /* Fullscreen Reset */
+        * { box-sizing: border-box; }
+        html, body { 
+            height: 100%; width: 100%; margin: 0; padding: 0; 
+            background: var(--cvsu-green); overflow: hidden;
+            font-family: -apple-system, sans-serif;
+        }
+        
+        #lock-screen { 
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            height: 100vh; width: 100vw; transition: opacity 0.5s;
+        }
+
+        /* Logo Fix */
+        .logo-container { width: 180px; height: 180px; margin-bottom: 30px; transition: all 0.5s ease; }
+        .logo-container img { width: 100%; height: 100%; object-fit: contain; }
+        .logo-container.break { transform: scale(2) rotate(10deg); opacity: 0; filter: blur(10px); }
+
+        .pin-display { 
+            width: 200px; height: 50px; background: white; border-radius: 10px; 
+            margin-bottom: 30px; display: flex; align-items: center; justify-content: center;
+            font-size: 24px; letter-spacing: 10px; color: #333;
+        }
+
+        .pin-pad { display: grid; grid-template-columns: repeat(3, 80px); gap: 20px; }
+        .pin-btn { 
+            width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--cvsu-gold); 
+            color: white; background: none; font-size: 28px; font-weight: bold;
+            display: flex; align-items: center; justify-content: center; outline: none;
+        }
+        .pin-btn:active { background: rgba(255, 215, 0, 0.3); }
+
+        /* Main App hidden initially */
+        #main-app { display: none; background: white; height: 100vh; width: 100vw; overflow-y: auto; padding: 20px; }
+    </style>
+</head>
+<body>
+
+    <div id="lock-screen">
+        <div class="logo-container" id="cvsu-logo">
+            <img src="cvsu-logo.png" alt="CvSU Logo" onerror="this.src='https://upload.wikimedia.org/wikipedia/en/thumb/9/9f/Cavite_State_University_%28CvSU%29.png/220px-Cavite_State_University_%28CvSU%29.png'">
+        </div>
+        
+        <div class="pin-display" id="dots"></div>
+
+        <div class="pin-pad">
+            <button class="pin-btn" onclick="addPin('1')">1</button>
+            <button class="pin-btn" onclick="addPin('2')">2</button>
+            <button class="pin-btn" onclick="addPin('3')">3</button>
+            <button class="pin-btn" onclick="addPin('4')">4</button>
+            <button class="pin-btn" onclick="addPin('5')">5</button>
+            <button class="pin-btn" onclick="addPin('6')">6</button>
+            <button class="pin-btn" onclick="addPin('7')">7</button>
+            <button class="pin-btn" onclick="addPin('8')">8</button>
+            <button class="pin-btn" onclick="addPin('9')">9</button>
+            <div style="width:80px"></div>
+            <button class="pin-btn" onclick="addPin('0')">0</button>
+            <button class="pin-btn" style="font-size: 16px;" onclick="clearPin()">DEL</button>
+        </div>
+    </div>
+
+    <div id="main-app">
+        <h1 style="color: var(--cvsu-green)">Class Schedule</h1>
+        <p>Welcome back, Lenard!</p>
+        </div>
+
+    <script>
+        let currentInput = "";
+        const correctPin = "2113"; // Updated PIN
+
+        function addPin(num) {
+            if (currentInput.length < 4) {
+                currentInput += num;
+                document.getElementById('dots').innerText = "•".repeat(currentInput.length);
+                
+                if (currentInput.length === 4) {
+                    if (currentInput === correctPin) {
+                        unlock();
+                    } else {
+                        setTimeout(() => {
+                            alert("Wrong PIN");
+                            clearPin();
+                        }, 100);
+                    }
+                }
+            }
+        }
+
+        function clearPin() {
+            currentInput = "";
+            document.getElementById('dots').innerText = "";
+        }
+
+        function unlock() {
+            const logo = document.getElementById('cvsu-logo');
+            logo.classList.add('break');
+            if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+            
+            setTimeout(() => {
+                document.getElementById('lock-screen').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('lock-screen').style.display = 'none';
+                    document.getElementById('main-app').style.display = 'block';
+                }, 500);
+            }, 600);
+        }
+    </script>
+</body>
+</html>
