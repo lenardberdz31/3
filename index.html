@@ -4,214 +4,153 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>CvSU Dashboard</title>
+    <title>CvSU Schedule</title>
     <style>
-        :root { --green: #006400; --gold: #FFD700; --white: #ffffff; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
-        body { font-family: -apple-system, sans-serif; background: var(--green); height: 100vh; width: 100vw; overflow: hidden; }
+        :root { --gold: #fbc02d; --green: #8bc34a; --white: #ffffff; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { margin: 0; padding: 0; background: #000; font-family: 'Arial Black', sans-serif; overflow: hidden; height: 100vh; width: 100vw; }
         
-        /* PIN Entry Screen */
-        #lock-screen { height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; position: relative; }
-        .logo-container img { width: 140px; height: 140px; transition: all 0.5s ease; }
-        .logo-container.break img { transform: scale(5) rotate(15deg); opacity: 0; filter: blur(15px); }
-        .pin-dots { height: 35px; color: white; font-size: 30px; letter-spacing: 12px; margin: 15px 0; font-weight: bold; }
-        .keypad { display: grid; grid-template-columns: repeat(3, 75px); gap: 12px; }
-        .key { width: 75px; height: 75px; border: 2px solid var(--gold); border-radius: 50%; color: white; background: none; font-size: 24px; font-weight: bold; }
-        .key:active { background: rgba(255, 215, 0, 0.2); }
-
-        /* Dashboard View */
-        #main-app { display: none; background: #f2f2f2; height: 100vh; width: 100vw; padding: 10px 15px; display: flex; flex-direction: column; }
-        .header { font-size: 26px; font-weight: 900; color: var(--green); text-align: center; margin: 5px 0; }
-        .grad-banner { background: var(--gold); color: var(--green); padding: 10px; border-radius: 12px; text-align: center; font-weight: 800; font-size: 15px; margin-bottom: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        
-        /* Schedule List - Optimized for No-Scroll */
-        #schedule-list { flex-grow: 1; display: flex; flex-direction: column; justify-content: space-around; overflow: hidden; }
-        .day-group { margin-bottom: 2px; }
-        .day-label { font-size: 14px; font-weight: 800; color: var(--green); text-transform: uppercase; border-bottom: 2px solid var(--gold); margin-bottom: 4px; display: inline-block; padding-right: 10px; }
-        
-        .card { 
-            background: white; padding: 10px 15px; border-radius: 12px; margin-bottom: 4px; 
-            border-left: 8px solid var(--green); display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.06); cursor: pointer;
+        /* BACKGROUND LAYER */
+        .bg-overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: linear-gradient(rgba(0,0,0,0.59), rgba(0,0,0,0.59)), url('image_992624.jpg'); 
+            background-size: cover; background-position: center; z-index: -1;
         }
-        .card:active { background: #fafafa; transform: scale(0.98); }
-        .card.faded { opacity: 0.5; filter: grayscale(1); }
-        .card-info b { font-size: 15px; display: block; color: #333; }
-        .card-info span { color: #666; font-size: 12px; font-weight: 600; }
-        
-        /* Subject Detail View */
-        #subject-view { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 2000; padding: 40px 20px; box-sizing: border-box; }
-        .view-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-        .tabs { display: flex; background: #eee; border-radius: 10px; margin-bottom: 20px; padding: 5px; }
-        .tab { flex: 1; padding: 10px; text-align: center; font-weight: bold; border-radius: 8px; font-size: 14px; }
-        .tab.active { background: var(--green); color: white; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
 
-        /* Utility Buttons */
-        .footer-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding-bottom: 15px; margin-top: 5px; }
-        .footer-btn { background: var(--green); color: white; padding: 14px; border: none; border-radius: 14px; font-weight: bold; font-size: 14px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        /* LOCK SCREEN */
+        #lock-screen { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: white; }
+        .pin-dots { display: flex; gap: 10px; margin: 20px 0; }
+        .dot { width: 12px; height: 12px; border: 2px solid white; border-radius: 50%; }
+        .dot.filled { background: white; }
+        .keypad { display: grid; grid-template-columns: repeat(3, 85px); gap: 15px; }
+        .key { width: 85px; height: 85px; border: 3px solid var(--gold); border-radius: 50%; color: var(--gold); background: none; font-size: 32px; font-weight: bold; }
+
+        /* MAIN DASHBOARD */
+        #main-app { display: none; height: 100%; padding: 40px 20px; flex-direction: column; align-items: center; }
+        .header-title { color: white; font-size: 48px; text-align: center; margin-bottom: 30px; line-height: 0.9; }
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; }
+        .wide-btn { grid-column: span 2; background: var(--gold); height: 75px; border-radius: 15px; border: none; font-size: 24px; color: white; font-weight: 900; box-shadow: 0 4px 0 #c49000; }
+        .sub-btn { background: var(--gold); height: 75px; border-radius: 15px; border: none; font-size: 20px; color: white; font-weight: 900; box-shadow: 0 4px 0 #c49000; }
+        .util-btn { background: var(--green); height: 55px; border-radius: 25px; border: none; font-size: 18px; color: white; font-weight: 900; }
+
+        /* SUBJECT VIEW */
+        #subject-view { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; flex-direction: column; align-items: center; padding-top: 50px; }
+        .nav-row { display: flex; gap: 10px; margin-top: 20px; }
+        .nav-btn { background: var(--gold); color: white; padding: 10px 15px; border-radius: 8px; border: none; font-weight: bold; }
+        .text-area { width: 90%; background: white; border-radius: 15px; padding: 15px; margin-top: 20px; flex-grow: 0.5; overflow-y: auto; }
     </style>
 </head>
 <body>
+    <div class="bg-overlay"></div>
 
     <div id="lock-screen">
-        <div class="logo-container" id="logo-box">
-            <img src="image_62b0e5.png" alt="CvSU" onerror="this.src='https://upload.wikimedia.org/wikipedia/en/9/9f/Cavite_State_University_%28CvSU%29.png'">
+        <img src="image_62b0e5.png" width="160" alt="Logo">
+        <h1 style="font-size: 42px; margin: 20px 0;">Welcome, sir!</h1>
+        <div class="pin-dots" id="pin-dots">
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
         </div>
-        <div class="pin-dots" id="pin-display"></div>
         <div class="keypad">
-            <button class="key" onclick="press('1')">1</button><button class="key" onclick="press('2')">2</button><button class="key" onclick="press('3')">3</button>
-            <button class="key" onclick="press('4')">4</button><button class="key" onclick="press('5')">5</button><button class="key" onclick="press('6')">6</button>
-            <button class="key" onclick="press('7')">7</button><button class="key" onclick="press('8')">8</button><button class="key" onclick="press('9')">9</button>
-            <div style="width:75px"></div><button class="key" onclick="press('0')">0</button>
+            <button class="key" onclick="press(1)">1</button><button class="key" onclick="press(2)">2</button><button class="key" onclick="press(3)">3</button>
+            <button class="key" onclick="press(4)">4</button><button class="key" onclick="press(5)">5</button><button class="key" onclick="press(6)">6</button>
+            <button class="key" onclick="press(7)">7</button><button class="key" onclick="press(8)">8</button><button class="key" onclick="press(9)">9</button>
+            <button class="key" style="grid-column: 2" onclick="press(0)">0</button>
         </div>
     </div>
 
     <div id="main-app">
-        <div class="header">Class Schedule</div>
-        <div class="grad-banner" id="grad-display" onclick="setGradDate()">Set Graduation Date</div>
+        <img src="image_62b0e5.png" width="80" alt="Logo">
+        <h1 class="header-title">Class<br>Schedule</h1>
         
-        <div id="schedule-list">
-            <div class="day-group">
-                <div class="day-label">Wed</div>
-                <div class="card" id="educ198" onclick="openSubject('EDUC 198 - Appraisal 2')"><div class="card-info"><b>EDUC 198</b><span>09:00 - 3:00</span></div><input type="checkbox" onclick="event.stopPropagation(); toggleFade('educ198')"></div>
-            </div>
-
-            <div class="day-group">
-                <div class="day-label">Thu</div>
-                <div class="card" id="gned01" onclick="openSubject('GNED 01 - Art App')"><div class="card-info"><b>GNED 01</b><span>07:00 - 9:00</span></div><input type="checkbox" onclick="event.stopPropagation(); toggleFade('gned01')"></div>
-                <div class="card" id="gned10" onclick="openSubject('GNED 10 - Gen and Soc')"><div class="card-info"><b>GNED 10</b><span>09:00 - 11:00</span></div><input type="checkbox" onclick="event.stopPropagation(); toggleFade('gned10')"></div>
-            </div>
-
-            <div class="day-group">
-                <div class="day-label">Fri</div>
-                <div class="card" id="gned07" onclick="openSubject('GNED 07 - Contemp')"><div class="card-info"><b>GNED 07</b><span>07:00 - 9:00</span></div><input type="checkbox" onclick="event.stopPropagation(); toggleFade('gned07')"></div>
-                <div class="card" id="gned13" onclick="openSubject('GNED 13 - Retorika')"><div class="card-info"><b>GNED 13</b><span>09:00 - 11:00</span></div><input type="checkbox" onclick="event.stopPropagation(); toggleFade('gned13')"></div>
-            </div>
-
-            <div class="day-group">
-                <div class="day-label">Sat</div>
-                <div class="card" id="gned02" onclick="openSubject('GNED 02 - Ethics')"><div class="card-info"><b>GNED 02</b><span>07:00 - 9:00</span></div><input type="checkbox" onclick="event.stopPropagation(); toggleFade('gned02')"></div>
-                <div class="card" id="gned09" onclick="openSubject('GNED 09 - Rizal')"><div class="card-info"><b>GNED 09</b><span>09:00 - 11:00</span></div><input type="checkbox" onclick="event.stopPropagation(); toggleFade('gned09')"></div>
-            </div>
+        <div class="btn-grid">
+            <button class="wide-btn" onclick="openSub('Competency Appraisal')">Competency Appraisal</button>
+            <button class="sub-btn" onclick="openSub('Art Appreciation')">Art App</button>
+            <button class="sub-btn" onclick="openSub('Gender and Society')">Gen Soc</button>
+            <button class="sub-btn" onclick="openSub('The Contemporary World')">Contemp</button>
+            <button class="sub-btn" onclick="openSub('Masining na Pagpapahayag')">Retorika</button>
+            <button class="sub-btn" onclick="openSub('Ethics')">Ethics</button>
+            <button class="sub-btn" onclick="openSub('Life and Works of Rizal')">Rizal</button>
+            <button class="util-btn" onclick="openSub('Exit Clearance')">Exit Clearance</button>
+            <button class="util-btn" onclick="openSub('General Notes')">General Notes</button>
         </div>
-        
-        <div class="footer-btns">
-            <button class="footer-btn" onclick="handlePortal()">Portal</button>
-            <button class="footer-btn" style="background: #333;" onclick="openClearance()">Clearance</button>
-        </div>
+
+        <p id="grad-text" style="color: var(--green); font-size: 20px; margin-top: 30px; cursor: pointer;" onclick="setGrad()">244 days before Graduation!</p>
     </div>
 
     <div id="subject-view">
-        <div class="view-header">
-            <h2 id="view-title" style="color:var(--green)">Subject</h2>
-            <button onclick="closeSubject()" style="border:none; background:none; font-size:24px; font-weight:bold; color:var(--green)">✕</button>
+        <h1 id="view-title" style="color: white; text-align: center; width: 80%;">Subject</h1>
+        <div class="nav-row">
+            <button class="nav-btn" onclick="viewTab('notes')">Notes</button>
+            <button class="nav-btn" onclick="viewTab('reminders')">Reminders</button>
+            <button class="nav-btn" onclick="handleDrive()">Files</button>
         </div>
-        <div class="tabs">
-            <div class="tab active" onclick="switchTab(0)">Checklist</div>
-            <div class="tab" onclick="switchTab(1)">Grades</div>
-            <div class="tab" onclick="switchTab(2)">History</div>
+        <div class="text-area" id="content-box" contenteditable="true" oninput="saveContent()">Type here...</div>
+        <div class="nav-row" style="margin-top: auto; margin-bottom: 40px;">
+            <button class="util-btn" style="width: 140px;" onclick="viewTab('history')">History</button>
+            <button class="util-btn" style="width: 140px;" onclick="viewTab('grades')">Grade Tracker</button>
         </div>
-        <div id="tab-0" class="tab-content active">
-            <div style="display:flex; gap:10px; margin-bottom:15px;">
-                <input type="text" id="task-in" placeholder="New Task..." style="flex:1; padding:12px; border-radius:10px; border:1px solid #ddd;">
-                <button style="background:var(--green); color:white; border:none; padding:10px 15px; border-radius:10px;" onclick="addTask()">Add</button>
-            </div>
-            <ul id="task-list" style="list-style:none;"></ul>
-        </div>
-        <div id="tab-1" class="tab-content"><h3>Grade Predictor</h3><p>Predictor logic is ready.</p></div>
-        <div id="tab-2" class="tab-content"><h3>History Archive</h3><p>Sunday archive will appear here.</p></div>
+        <button class="nav-btn" style="position: absolute; top: 20px; left: 20px; background: red;" onclick="closeSub()">Back</button>
     </div>
 
     <script>
         let pin = "";
-        const correct = "2113"; // Your PIN
+        const correctPin = "2113"; // Updated PIN
+        let currentSub = "";
+        let currentTab = "notes";
 
         function press(n) {
             if(pin.length < 4) {
                 pin += n;
-                document.getElementById('pin-display').innerText = "•".repeat(pin.length);
+                document.querySelectorAll('.dot')[pin.length-1].classList.add('filled');
                 if(pin.length === 4) {
-                    if(pin === correct) {
-                        document.getElementById('logo-box').classList.add('break');
-                        if(navigator.vibrate) navigator.vibrate([100, 50, 100]);
-                        setTimeout(() => {
-                            document.getElementById('lock-screen').style.display = 'none';
-                            document.getElementById('main-app').style.display = 'flex';
-                        }, 600);
+                    if(pin === correctPin) {
+                        document.getElementById('lock-screen').style.display = 'none';
+                        document.getElementById('main-app').style.display = 'flex';
                     } else {
-                        alert("Wrong PIN"); pin = ""; document.getElementById('pin-display').innerText = "";
+                        alert("Wrong PIN"); pin = ""; 
+                        document.querySelectorAll('.dot').forEach(d => d.classList.remove('filled'));
                     }
                 }
             }
         }
 
-        function toggleFade(id) { document.getElementById(id).classList.toggle('faded'); }
-
-        function openSubject(title) {
-            document.getElementById('view-title').innerText = title;
-            document.getElementById('subject-view').style.display = 'block';
+        function openSub(name) {
+            currentSub = name;
+            document.getElementById('view-title').innerText = name;
+            document.getElementById('subject-view').style.display = 'flex';
+            viewTab('notes');
         }
 
-        function closeSubject() { document.getElementById('subject-view').style.display = 'none'; }
+        function closeSub() { document.getElementById('subject-view').style.display = 'none'; }
 
-        function switchTab(i) {
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.getElementById(`tab-${i}`).classList.add('active');
-            document.querySelectorAll('.tab')[i].classList.add('active');
+        function viewTab(tab) {
+            currentTab = tab;
+            const key = `${currentSub}_${tab}`;
+            document.getElementById('content-box').innerText = localStorage.getItem(key) || `Enter ${tab} for ${currentSub}...`;
         }
 
-        function setGradDate() {
-            const d = prompt("Graduation (YYYY-MM-DD):");
-            if(d) { localStorage.setItem('grad', d); updateGrad(); }
+        function saveContent() {
+            const key = `${currentSub}_${currentTab}`;
+            localStorage.setItem(key, document.getElementById('content-box').innerText);
         }
 
-        function updateGrad() {
-            const d = localStorage.getItem('grad');
-            if(d) {
-                const diff = Math.ceil((new Date(d) - new Date()) / (86400000));
-                document.getElementById('grad-display').innerText = `Graduation Countdown: ${diff} Days`;
-            }
+        function handleDrive() {
+            let link = localStorage.getItem(`${currentSub}_drive`) || prompt("Paste Google Drive Link:");
+            if(link) { localStorage.setItem(`${currentSub}_drive`, link); window.open(link, '_blank'); }
         }
 
-        function handlePortal() {
-            let u = localStorage.getItem('pUrl') || prompt("Portal Link:");
-            if(u) { localStorage.setItem('pUrl', u); window.open(u, '_blank'); }
-        }
-
-        updateGrad();
-    </script>
-</body>
-</html>
-                        alert("Wrong PIN"); pin = ""; document.getElementById('pin-display').innerText = "";
-                    }
-                }
-            }
-        }
-
-        function toggleFade(id) { document.getElementById(id).classList.toggle('faded'); } // 50% fade
-
-        function setGradDate() {
-            const d = prompt("Graduation (YYYY-MM-DD):");
-            if(d) { localStorage.setItem('grad', d); updateGrad(); }
+        function setGrad() {
+            const d = prompt("Enter Graduation (YYYY-MM-DD):");
+            if(d) localStorage.setItem('gradDate', d);
+            updateGrad();
         }
 
         function updateGrad() {
-            const d = localStorage.getItem('grad');
+            const d = localStorage.getItem('gradDate');
             if(d) {
-                const diff = Math.ceil((new Date(d) - new Date()) / (86400000));
-                document.getElementById('grad-display').innerText = `Graduation Countdown: ${diff} Days`;
+                const diff = Math.ceil((new Date(d) - new Date()) / 86400000);
+                document.getElementById('grad-text').innerText = `${diff} days before Graduation!`;
             }
         }
-
-        function handlePortal() {
-            let u = localStorage.getItem('pUrl') || prompt("Portal Link:");
-            if(u) { localStorage.setItem('pUrl', u); window.open(u, '_blank'); }
-        }
-
         updateGrad();
     </script>
 </body>
